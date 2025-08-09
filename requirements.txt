@@ -4,4 +4,5 @@ numpy
 openai
 python-dotenv
 langsmith
+langchain-openai
 
