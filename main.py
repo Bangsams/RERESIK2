@@ -53,28 +53,35 @@ if st.session_state.page == 'main':
     # Contoh berita
     st.markdown('### Berita Terbaru')
     sample_news = [
-        {
-            'title': 'Kegiatan bersih-bersih lingkungan',
-            'desc': 'Komunitas lokal mengadakan aksi pemilahan sampah',
-            'img': 'bersih kampung.jpeg'  # ganti dengan URL gambar yang valid
-        },
-        {
-            'title': 'Tips membuat kompos',
-            'desc': 'Langkah mudah membuat kompos dari sampah organik di rumah',
-            'img': 'pupuk kompos.jpeg'
-        },
-        {
-            'title': 'Bank Sampah Digital',
-            'desc': 'Inovasi pengelolaan sampah anorganik untuk ekonomi sirkular',
-            'img': 'bank sampah digital.png'
-        }
-    ]
+    {
+        'title': 'Kegiatan bersih-bersih lingkungan',
+        'desc': 'Komunitas lokal mengadakan aksi pemilahan sampah',
+        'img': 'images/bersih_kampung.jpeg'
+    },
+    {
+        'title': 'Tips membuat kompos',
+        'desc': 'Langkah mudah membuat kompos dari sampah organik di rumah',
+        'img': 'images/pupuk_kompos.jpeg'
+    },
+    {
+        'title': 'Bank Sampah Digital',
+        'desc': 'Inovasi pengelolaan sampah anorganik untuk ekonomi sirkular',
+        'img': 'images/bank_sampah_digital.png'
+    }
+]
 
-    cols = st.columns(3)
-    for c, news in zip(cols, sample_news):
-        with c:
-            st.image(news['img'], use_column_width=True)
-            st.markdown(f'<div class="news-box"><b>{news["title"]}</b><br><small>{news["desc"]}</small></div>', unsafe_allow_html=True)
+cols = st.columns(3)
+for c, news in zip(cols, sample_news):
+    with c:
+        img_path = news['img']
+        if os.path.exists(img_path):
+            st.image(img_path, use_container_width=True)
+        else:
+            st.warning(f"Gambar tidak ditemukan:\n{img_path}")
+        st.markdown(
+            f'<div class="news-box"><b>{news["title"]}</b><br><small>{news["desc"]}</small></div>',
+            unsafe_allow_html=True
+        )
 
     st.markdown('---')
     st.header('Deteksi Sampah - Kamera & Pelaporan')
