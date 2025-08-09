@@ -52,36 +52,29 @@ if st.session_state.page == 'main':
 
     # Contoh berita
     st.markdown('### Berita Terbaru')
-    sample_news = [
+sample_news = [
     {
         'title': 'Kegiatan bersih-bersih lingkungan',
-        'desc': 'Komunitas lokal mengadakan aksi pemilahan sampah',
-        'img': 'images/bersih_kampung.jpeg'
+        'desc': 'Komunitas lokal mengadakan aksi pemilahan sampah'
     },
     {
         'title': 'Tips membuat kompos',
-        'desc': 'Langkah mudah membuat kompos dari sampah organik di rumah',
-        'img': 'images/pupuk_kompos.jpeg'
+        'desc': 'Langkah mudah membuat kompos dari sampah organik di rumah'
     },
     {
         'title': 'Bank Sampah Digital',
-        'desc': 'Inovasi pengelolaan sampah anorganik untuk ekonomi sirkular',
-        'img': 'images/bank_sampah_digital.png'
+        'desc': 'Inovasi pengelolaan sampah anorganik untuk ekonomi sirkular'
     }
 ]
 
 cols = st.columns(3)
 for c, news in zip(cols, sample_news):
     with c:
-        img_path = news['img']
-        if os.path.exists(img_path):
-            st.image(img_path, use_container_width=True)
-        else:
-            st.warning(f"Gambar tidak ditemukan:\n{img_path}")
         st.markdown(
             f'<div class="news-box"><b>{news["title"]}</b><br><small>{news["desc"]}</small></div>',
             unsafe_allow_html=True
         )
+
 
     st.markdown('---')
     st.header('Deteksi Sampah - Kamera & Pelaporan')
