@@ -53,9 +53,19 @@ st.markdown("""
 if 'page' not in st.session_state:
     st.session_state.page = 'main'
 
+
 def go_to_berita():
     if st.session_state.search_input.strip() != '':
         st.session_state.page = 'berita'
+
+        # Logging search ke LangSmith
+        if LANGSMITH_API_KEY:
+            ls_client.log_event(
+                name="search_input",
+                description=f"User searched for: {st.session_state.search_input.strip()}",
+                metadata={"search_input": st.session_state.search_input.strip()}
+            )
+
 
 # Main page content
 if st.session_state.page == 'main':
@@ -129,9 +139,18 @@ Gambar: data:image/jpeg;base64,{base64_img}
         )
         return resp.choices[0].message.content
 
+
     if img_file:
         image = Image.open(img_file)
         st.image(image, caption='Foto diambil', use_column_width=True)
+
+        # Logging saat user mengambil foto
+        if LANGSMITH_API_KEY:
+            ls_client.log_event(
+                name="camera_photo_taken",
+                description="User mengambil foto untuk analisis sampah",
+                metadata={"use_ai": use_ai}
+            )
 
         if use_ai and OPENAI_API_KEY:
             st.subheader('Hasil Analisis AI')
@@ -173,8 +192,18 @@ Gambar: data:image/jpeg;base64,{base64_img}
                 )
                 r.raise_for_status()
                 st.success('Laporan terkirim.')
+
+                # Logging pengiriman notifikasi ke LangSmith
+                if LANGSMITH_API_KEY:
+                    ls_client.log_event(
+                        name="pushover_notification_sent",
+                        description=f"Laporan terkirim: {msg}",
+                        metadata={"location": location, "name": name}
+                    )
+
             except Exception as e:
                 st.error(f'Gagal mengirim notifikasi: {e}')
+
 
 if st.session_state.page == 'berita':
     import berita
