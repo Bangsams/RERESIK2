@@ -20,9 +20,9 @@ LANGSMITH_API_KEY = st.secrets.get("LANGCHAIN_API_KEY", None)
 
 # Setup environment variables untuk LangChain tracing
 if LANGSMITH_API_KEY:
-    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_TRACING"] = "true"
     os.environ["LANGCHAIN_API_KEY"] = LANGSMITH_API_KEY
-    os.environ["LANGCHAIN_PROJECT"] = "RERESIK AI"
+    os.environ["LANGCHAIN_PROJECT"] = "Test Tracing"
     ls_client = LangSmithClient(api_key=LANGSMITH_API_KEY)
 
     # Model LangChain untuk logging
