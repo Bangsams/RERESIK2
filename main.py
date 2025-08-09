@@ -55,15 +55,15 @@ if st.session_state.page == 'main':
     st.markdown('### Berita Terbaru')
     sample_news = [
         {
-            'title': 'Kegiatan bersih-bersih lingkungan',
+            'title': 'Kegiatan bersih-bersih lingkungan 🧹',
             'desc': 'Komunitas lokal mengadakan aksi pemilahan sampah'
         },
         {
-            'title': 'Tips membuat kompos',
+            'title': 'Tips membuat kompos 🫛',
             'desc': 'Langkah mudah membuat kompos dari sampah organik di rumah'
         },
         {
-            'title': 'Bank Sampah Digital',
+            'title': 'Bank Sampah Digital 🖥️',
             'desc': 'Inovasi pengelolaan sampah anorganik untuk ekonomi sirkular'
         }
     ]
