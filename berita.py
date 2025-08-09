@@ -1,18 +1,16 @@
 import streamlit as st
-import os
 import requests
-from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv(override=True)
+# Ambil API key dari streamlit secrets
+SERPER_API_KEY = st.secrets.get("SERPER_API_KEY")
+OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY")
 
-SERPER_API_KEY = os.getenv("SERPER_API_KEY")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 def cari_berita(query):
     if not SERPER_API_KEY:
-        st.error("API Key SERPER_API_KEY tidak ditemukan di .env")
+        st.error("API Key SERPER_API_KEY tidak ditemukan di Streamlit secrets")
         return []
 
     url = "https://google.serper.dev/news"
@@ -73,7 +71,7 @@ def show_berita():
         st.warning("Berita tidak ditemukan atau terjadi kesalahan.")
         return
 
-    # Tampilkan satu thumbnail pertama (jika ada)
+    # Tampilkan thumbnail pertama yang ada
     first_thumbnail_shown = False
     for b in berita_list:
         if b['thumbnail'] and not first_thumbnail_shown:
@@ -96,4 +94,3 @@ def show_berita():
         st.write(teks_ringkas)
 
         st.markdown("---")
-
