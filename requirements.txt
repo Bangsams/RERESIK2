@@ -1,8 +1,9 @@
 streamlit
-pandas
-numpy
+requests
+pillow
 openai
 python-dotenv
 langsmith
 langchain-openai
-
+typing-extensions
+pydantic
