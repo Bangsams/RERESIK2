@@ -16,7 +16,6 @@ PUSHOVER_APP_TOKEN = os.getenv('PUSHOVER_TOKEN')
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-st.set_page_config(page_title='RERESIK🌴', layout='wide')
 st.title("RERESIK 🌴")
 
 
