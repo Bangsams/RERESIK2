@@ -8,16 +8,36 @@ import requests
 from openai import OpenAI
 from dotenv import load_dotenv
 
+# ===== Tambahan LangSmith =====
+from langchain_openai import ChatOpenAI
+from langsmith import Client as LangSmithClient
+# ==============================
+
 load_dotenv(override=True)
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 PUSHOVER_USER_KEY = os.getenv('PUSHOVER_USER')
 PUSHOVER_APP_TOKEN = os.getenv('PUSHOVER_TOKEN')
 
+# ===== Tambahan LangSmith =====
+LANGSMITH_API_KEY = os.getenv('LANGCHAIN_API_KEY')
+if LANGSMITH_API_KEY:
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_API_KEY"] = LANGSMITH_API_KEY
+    os.environ["LANGCHAIN_PROJECT"] = "RERESIK-AI-Trace"
+    ls_client = LangSmithClient(api_key=LANGSMITH_API_KEY)
+
+    # Model LangChain untuk logging
+    llm_trace = ChatOpenAI(
+        model="gpt-4o-mini",
+        temperature=0,
+        openai_api_key=OPENAI_API_KEY
+    )
+# ==============================
+
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 st.set_page_config(page_title='RERESIK🌴', layout='wide')
-
 
 # Styling
 st.markdown("""
@@ -39,7 +59,6 @@ def go_to_berita():
 
 # Main page content
 if st.session_state.page == 'main':
-    # Header dan search bar
     col1, col2 = st.columns([3, 1])
     with col1:
         st.markdown('<div class="title">RERESIK🌴</div>', unsafe_allow_html=True)
@@ -52,21 +71,11 @@ if st.session_state.page == 'main':
             on_change=go_to_berita
         )
 
-    # Daftar berita tanpa gambar
     st.markdown('### Berita Terbaru')
     sample_news = [
-        {
-            'title': 'Kegiatan bersih-bersih lingkungan 🧹',
-            'desc': 'Komunitas lokal mengadakan aksi pemilahan sampah'
-        },
-        {
-            'title': 'Tips membuat kompos 🫛',
-            'desc': 'Langkah mudah membuat kompos dari sampah organik di rumah'
-        },
-        {
-            'title': 'Bank Sampah Digital 🖥️',
-            'desc': 'Inovasi pengelolaan sampah anorganik untuk ekonomi sirkular'
-        }
+        {'title': 'Kegiatan bersih-bersih lingkungan 🧹', 'desc': 'Komunitas lokal mengadakan aksi pemilahan sampah'},
+        {'title': 'Tips membuat kompos 🫛', 'desc': 'Langkah mudah membuat kompos dari sampah organik di rumah'},
+        {'title': 'Bank Sampah Digital 🖥️', 'desc': 'Inovasi pengelolaan sampah anorganik untuk ekonomi sirkular'}
     ]
 
     cols = st.columns(3)
@@ -80,10 +89,8 @@ if st.session_state.page == 'main':
     st.markdown('---')
     st.header('Deteksi Sampah - Kamera & Pelaporan')
 
-    # Kamera input (widget harus muncul sekali saja)
     img_file = st.camera_input('Arahkan kamera ke tumpukan sampah lalu ambil foto', key='camera_input_unique')
 
-    # Sidebar kalibrasi
     st.sidebar.header('Kalibrasi Estimasi Berat')
     ref_cm = st.sidebar.number_input('Lebar objek referensi (cm)', min_value=0.0, value=5.0, step=0.1)
     ref_wt = st.sidebar.number_input('Berat objek referensi (gram)', min_value=0.0, value=0.0, step=1.0)
@@ -94,6 +101,20 @@ if st.session_state.page == 'main':
         image.save(buf, format="JPEG")
         buf.seek(0)
         base64_img = base64.b64encode(buf.read()).decode('utf-8')
+
+        # ===== Jika LangSmith aktif, log lewat LangChain =====
+        if LANGSMITH_API_KEY:
+            messages = [
+                ("system", "Anda adalah model vision yang dapat mengklasifikasikan sampah organik atau anorganik dan mengestimasi beratnya."),
+                ("human", f"""
+Klasifikasikan apakah sampah ini organik atau anorganik. 
+Berikan estimasi berat (gram) secara kasar berdasarkan skala visual.
+Gambar: data:image/jpeg;base64,{base64_img}
+""")
+            ]
+            result = llm_trace.invoke(messages)
+            return result.content
+        # ====================================================
 
         resp = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -155,7 +176,6 @@ if st.session_state.page == 'main':
             except Exception as e:
                 st.error(f'Gagal mengirim notifikasi: {e}')
 
-# Import fungsi berita saat halaman berita aktif
 if st.session_state.page == 'berita':
     import berita
     berita.show_berita()
