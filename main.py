@@ -6,21 +6,19 @@ import tempfile
 import base64
 import requests
 from openai import OpenAI
-from dotenv import load_dotenv
 
 # ===== Tambahan LangSmith =====
 from langchain_openai import ChatOpenAI
 from langsmith import Client as LangSmithClient
 # ==============================
 
-load_dotenv(override=True)
+# Ambil secrets dari Streamlit
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+PUSHOVER_USER_KEY = st.secrets["PUSHOVER_USER"]
+PUSHOVER_APP_TOKEN = st.secrets["PUSHOVER_TOKEN"]
+LANGSMITH_API_KEY = st.secrets.get("LANGCHAIN_API_KEY", None)
 
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-PUSHOVER_USER_KEY = os.getenv('PUSHOVER_USER')
-PUSHOVER_APP_TOKEN = os.getenv('PUSHOVER_TOKEN')
-
-# ===== Tambahan LangSmith =====
-LANGSMITH_API_KEY = os.getenv('LANGCHAIN_API_KEY')
+# Setup environment variables untuk LangChain tracing
 if LANGSMITH_API_KEY:
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
     os.environ["LANGCHAIN_API_KEY"] = LANGSMITH_API_KEY
@@ -33,7 +31,6 @@ if LANGSMITH_API_KEY:
         temperature=0,
         openai_api_key=OPENAI_API_KEY
     )
-# ==============================
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -52,7 +49,6 @@ st.markdown("""
 # Simple page routing
 if 'page' not in st.session_state:
     st.session_state.page = 'main'
-
 
 def go_to_berita():
     if st.session_state.search_input.strip() != '':
