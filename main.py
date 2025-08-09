@@ -36,8 +36,9 @@ def go_to_berita():
     if st.session_state.search_input.strip() != '':
         st.session_state.page = 'berita'
 
-# Header + Search Bar
+# Main page content
 if st.session_state.page == 'main':
+    # Header dan search bar
     col1, col2 = st.columns([3, 1])
     with col1:
         st.markdown('<div class="title">RERESIK</div>', unsafe_allow_html=True)
@@ -50,48 +51,42 @@ if st.session_state.page == 'main':
             on_change=go_to_berita
         )
 
-    # Contoh berita
+    # Daftar berita tanpa gambar
     st.markdown('### Berita Terbaru')
-sample_news = [
-    {
-        'title': 'Kegiatan bersih-bersih lingkungan',
-        'desc': 'Komunitas lokal mengadakan aksi pemilahan sampah'
-    },
-    {
-        'title': 'Tips membuat kompos',
-        'desc': 'Langkah mudah membuat kompos dari sampah organik di rumah'
-    },
-    {
-        'title': 'Bank Sampah Digital',
-        'desc': 'Inovasi pengelolaan sampah anorganik untuk ekonomi sirkular'
-    }
-]
+    sample_news = [
+        {
+            'title': 'Kegiatan bersih-bersih lingkungan',
+            'desc': 'Komunitas lokal mengadakan aksi pemilahan sampah'
+        },
+        {
+            'title': 'Tips membuat kompos',
+            'desc': 'Langkah mudah membuat kompos dari sampah organik di rumah'
+        },
+        {
+            'title': 'Bank Sampah Digital',
+            'desc': 'Inovasi pengelolaan sampah anorganik untuk ekonomi sirkular'
+        }
+    ]
 
-cols = st.columns(3)
-for c, news in zip(cols, sample_news):
-    with c:
-        st.markdown(
-            f'<div class="news-box"><b>{news["title"]}</b><br><small>{news["desc"]}</small></div>',
-            unsafe_allow_html=True
-        )
-
+    cols = st.columns(3)
+    for c, news in zip(cols, sample_news):
+        with c:
+            st.markdown(
+                f'<div class="news-box"><b>{news["title"]}</b><br><small>{news["desc"]}</small></div>',
+                unsafe_allow_html=True
+            )
 
     st.markdown('---')
     st.header('Deteksi Sampah - Kamera & Pelaporan')
 
-    # Kamera input
-    img_file = st.camera_input('Arahkan kamera ke tumpukan sampah lalu ambil foto',  key='camera_input_unique')
+    # Kamera input (widget harus muncul sekali saja)
+    img_file = st.camera_input('Arahkan kamera ke tumpukan sampah lalu ambil foto', key='camera_input_unique')
 
     # Sidebar kalibrasi
     st.sidebar.header('Kalibrasi Estimasi Berat')
     ref_cm = st.sidebar.number_input('Lebar objek referensi (cm)', min_value=0.0, value=5.0, step=0.1)
     ref_wt = st.sidebar.number_input('Berat objek referensi (gram)', min_value=0.0, value=0.0, step=1.0)
     use_ai = st.sidebar.checkbox('Gunakan OpenAI GPT-4o untuk analisis', value=True)
-
-    # Fungsi analyze_with_openai dan handling img_file di sini juga
-
-    ...
-
 
     def analyze_with_openai(image):
         buf = io.BytesIO()
@@ -131,15 +126,16 @@ for c, news in zip(cols, sample_news):
             b = io.BytesIO(summary.encode())
             st.download_button('Unduh (TXT)', data=b, file_name='analisis.txt')
 
-    # Form pelaporan
     st.markdown('---')
     st.header('Laporkan Sampah')
+
     with st.form('report_form'):
         name = st.text_input('Nama')
         location = st.text_input('Lokasi')
         desc = st.text_area('Deskripsi')
         photo = st.file_uploader('Lampiran (opsional)', type=['jpg', 'png', 'jpeg'])
         submit = st.form_submit_button('Kirim')
+
         if submit:
             msg = f"Laporan dari {name or 'Anon'}\nLokasi: {location}\nDeskripsi: {desc}"
             attach = None
@@ -158,7 +154,7 @@ for c, news in zip(cols, sample_news):
             except Exception as e:
                 st.error(f'Gagal mengirim notifikasi: {e}')
 
-# Import fungsi berita di bawah agar tidak circular import
+# Import fungsi berita saat halaman berita aktif
 if st.session_state.page == 'berita':
     import berita
     berita.show_berita()
