@@ -42,7 +42,7 @@ if st.session_state.page == 'main':
     # Header dan search bar
     col1, col2 = st.columns([3, 1])
     with col1:
-        st.markdown('<div class="title">RERESIK</div>', unsafe_allow_html=True)
+        st.markdown('<div class="title">RERESIK🌴</div>', unsafe_allow_html=True)
         st.markdown('<div class="subtitle">Deteksi sampah & berita tentang kebersihan dan renewable</div>', unsafe_allow_html=True)
     with col2:
         st.text_input(
